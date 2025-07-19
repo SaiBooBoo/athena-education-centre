@@ -1,0 +1,106 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* {*color theme for my upcoming website and project*/ 
+:root {
+  /* hsl (fallback color) */
+  --bg-dark: hsl(4 100% 3%);
+  --bg: hsl(15 100% 4%);
+  --bg-light: hsl(26 100% 7%);
+  --text: hsl(30 100% 90%);
+  --text-muted: hsl(31 62% 64%);
+  --highlight: hsl(38 100% 23%);
+  --border: hsl(35 100% 16%);
+  --border-muted: hsl(27 100% 11%);
+  --primary: hsl(32 77% 61%);
+  --secondary: hsl(208 100% 70%);
+  --danger: hsl(8 68% 66%);
+  --warning: hsl(52 59% 44%);
+  --success: hsl(152 45% 49%);
+  --info: hsl(217 80% 68%);
+  /* oklch */
+  --bg-dark: oklch(0.1 0.065 67);
+  --bg: oklch(0.15 0.065 67);
+  --bg-light: oklch(0.2 0.065 67);
+  --text: oklch(0.96 0.1 67);
+  --text-muted: oklch(0.76 0.1 67);
+  --highlight: oklch(0.5 0.13 67);
+  --border: oklch(0.4 0.13 67);
+  --border-muted: oklch(0.3 0.13 67);
+  --primary: oklch(0.76 0.13 67);
+  --secondary: oklch(0.76 0.13 247);
+  --danger: oklch(0.7 0.13 30);
+  --warning: oklch(0.7 0.13 100);
+  --success: oklch(0.7 0.13 160);
+  --info: oklch(0.7 0.13 260);
+}
+body.light {
+  /* hsl (fallback color) */
+  --bg-dark: hsl(30 100% 87%);
+  --bg: hsl(30 100% 92%);
+  --bg-light: hsl(30 100% 97%);
+  --text: hsl(356 100% 6%);
+  --text-muted: hsl(35 100% 16%);
+  --highlight: hsl(31 100% 92%);
+  --border: hsl(36 90% 37%);
+  --border-muted: hsl(33 64% 53%);
+  --primary: hsl(35 100% 16%);
+  --secondary: hsl(203 100% 21%);
+  --danger: hsl(7 51% 41%);
+  --warning: hsl(53 100% 15%);
+  --success: hsl(161 100% 17%);
+  --info: hsl(217 54% 44%);
+  /* oklch */
+  --bg-dark: oklch(0.92 0.065 67);
+  --bg: oklch(0.96 0.065 67);
+  --bg-light: oklch(1 0.065 67);
+  --text: oklch(0.15 0.13 67);
+  --text-muted: oklch(0.4 0.13 67);
+  --highlight: oklch(1 0.13 67);
+  --border: oklch(0.6 0.13 67);
+  --border-muted: oklch(0.7 0.13 67);
+  --primary: oklch(0.4 0.13 67);
+  --secondary: oklch(0.4 0.13 247);
+  --danger: oklch(0.5 0.13 30);
+  --warning: oklch(0.5 0.13 100);
+  --success: oklch(0.5 0.13 160);
+  --info: oklch(0.5 0.13 260);
+}
+
+/* Apply theme transitions only to theme-sensitive properties */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Specific transitions for theme-sensitive elements */
+[class*="bg-"], 
+[class*="text-"], 
+[class*="border-"],
+[class*="stroke-"],
+[class*="fill-"],
+[class*="shadow-"],
+[class*="ring-"] {
+  transition: background-color 0.3s ease, 
+              color 0.3s ease, 
+              border-color 0.3s ease,
+              stroke 0.3s ease,
+              fill 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+/* Preserve specific component transitions */
+.sidebar {
+  transition: width 0.3s ease-in-out, 
+              transform 0.3s ease-in-out;
+}
+
+/* Add this for any other components with custom transitions */
+.header-search input {
+  transition: all 0.3s ease;
+}
+
