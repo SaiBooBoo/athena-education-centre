@@ -9,10 +9,10 @@ import LoginComponent from "./ui_components/LoginComponent";
 import HomeComponent from "./ui_components/HomeComponent";
 
 // Dashboard Pages
-import StudentDashboardComponent from "./pages/dashboardComponents/StudentSearchComponent";
-import ParentDashboardComponent from "./pages/dashboardComponents/ParentSearchComponent";
-import TeacherDashboardComponent from "./pages/dashboardComponents/TeacherSearchComponent";
-import AdminDashboardComponent from "./pages/dashboardComponents/AdminDashboardComponent";
+import StudentDashboardComponent from "./pages/search/StudentSearchComponent";
+import ParentDashboardComponent from "./pages/search/ParentSearchComponent";
+import TeacherDashboardComponent from "./pages/search/TeacherSearchComponent";
+import AdminDashboardComponent from "./pages/search/AdminDashboardComponent";
 
 // Support Pages
 import HelpComponent from "./pages/support/HelpComponent";
@@ -32,6 +32,9 @@ import ParentRegistration from "./pages/registeration/ParentRegistration";
 
 // Auth Service
 import { isLoggedIn } from "./service/AuthService";
+import ParentEditComponent from "./pages/edits/ParentEditComponent";
+import StudentEditComponent from "./pages/edits/StudentEditComponent";
+import TeacherEditComponent from "./pages/edits/TeacherEditComponent";
 
 // Guard Component
 const AuthenticationGuard = ({ children }) => {
@@ -83,6 +86,9 @@ const routeConfig = [
   { path: "/registerStudent", component: <StudentRegistration /> },
   { path: "/registerTeacher", component: <TeacherRegistration /> },
   { path: "/registerParent", component: <ParentRegistration /> },
+  { path: "/edit-parent/:id", component: <ParentEditComponent /> },
+  { path: "/edit-student/:id", component: <StudentEditComponent /> },
+  { path: "/edit-teacher/:id", component: <TeacherEditComponent /> },
 ];
 
 // App Component

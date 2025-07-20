@@ -16,6 +16,9 @@ export type ParentSummaryDto ={
   displayName: string
   job: string
   phoneNumber: string
+  nrcNumber: string
+  address: string
+  dob: string
   parentType: string
 }
 

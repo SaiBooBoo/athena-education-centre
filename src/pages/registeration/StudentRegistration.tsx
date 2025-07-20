@@ -17,7 +17,6 @@ export default function StudentRegistrationForm() {
     parents: [] as number[],
   });
 
-  const [profileImage, setProfileImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successStudentId, setSuccessStudentId] = useState<number | null>(null);
@@ -27,11 +26,6 @@ export default function StudentRegistrationForm() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setProfileImage(e.target.files[0]);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,19 +50,6 @@ export default function StudentRegistrationForm() {
       console.log("Student registered:", regResp.data);
       setSuccessStudentId(studentId);
 
-      // 2) If image selected, upload separately via PUT
-      if (studentId && profileImage) {
-        const imageData = new FormData();
-        imageData.append("file", profileImage);
-
-        await axios.put(
-          `http://localhost:8080/api/students/${studentId}/update-image`,
-          imageData,
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
-        console.log("Image uploaded for student ID", studentId);
-      }
-
       // Reset form
       setFormData({
         username: "",
@@ -81,7 +62,6 @@ export default function StudentRegistrationForm() {
         accountType: "student",
         parents: []
       });
-      setProfileImage(null);
     } catch (err: any) {
       setError(err.response?.data?.message || err.message);
     } finally {
@@ -186,16 +166,6 @@ export default function StudentRegistrationForm() {
           />
         </div>
 
-        {/* Profile Image */}
-        <div>
-          <label className="block text-sm font-medium">Profile Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="w-full"
-          />
-        </div>
 
         {/* Submit Button */}
         <button

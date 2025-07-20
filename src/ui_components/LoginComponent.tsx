@@ -77,9 +77,7 @@ export default function LoginComponent() {
                   placeholder="Enter your username"
                   required
                 />
-                {username === "" && (
-                  <p className="text-red-500 text-sm mt-1">Username must not be empty.</p>
-                )}
+               
                 {username !== "" && password.length < 3 && (
                   <p className="text-red-500 text-sm mt-1">Invalid password.</p>
                 )}
@@ -101,9 +99,7 @@ export default function LoginComponent() {
                   placeholder="Enter your password"
                   required
                 />
-                {password === "" && (
-                  <p className="text-red-500 text-sm mt-1">Password must not be empty.</p>
-                )}
+              
                 {password !== "" && password.length < 3 && (
                   <p className="text-red-500 text-sm mt-1">Invalid password.</p>
                 )}

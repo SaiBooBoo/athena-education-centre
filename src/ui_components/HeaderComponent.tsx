@@ -12,6 +12,14 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [academicYear, setAcademicYear] = useState("2024/2025");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [username, setUsername] = useState('');
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
   
   
   // Apply theme class to body
@@ -43,7 +51,7 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
     <nav 
       className={`sticky top-0 z-50 bg-[var(--bg)] text-[var(--text)] shadow-lg 
                  transition-all duration-300 ease-in-out
-                 ${isSidebarExpanded ? 'md:ml-64' : 'md:ml-20'}`}
+                 ${isSidebarExpanded ? '' : ''}`}
     >
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
@@ -156,7 +164,7 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="px-4 py-3 border-b border-[var(--border-muted)]">
-                    <p className="text-sm font-medium text-[var(--text)]">John Doe</p>
+                    <p className="text-sm font-medium text-[var(--text)]">{username}</p>
                     <p className="text-xs text-[var(--text-muted)]">Administrator</p>
                   </div>
                   <div className="py-1">
