@@ -3,7 +3,8 @@ import axios from "axios";
 import type { Gender } from "../../modal/dtos/student.dto";
 import { motion } from "framer-motion";
 import { ParentSummaryDto } from "../../modal/dtos/dtos";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { FaUserPlus } from "react-icons/fa";
 
 type Student = {
   id: number;
@@ -27,7 +28,7 @@ export default function StudentSearchComponent() {
   const [searchGender, setSearchGender] = useState<Gender | ''>('');
 
   const BACKEND_URL = 'http://localhost:8080/api/students';
-
+  const navigate = useNavigate();
   useEffect(() => {
     setLoading(true);
     axios.get<Student[]>(BACKEND_URL)
@@ -89,6 +90,17 @@ export default function StudentSearchComponent() {
             <option value="MALE">Male</option>
             <option value="FEMALE">Female</option>
           </select>
+
+          
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate("/registerStudent")}
+                className="flex items-center bg-[var(--bg-light)] border border-[var(--border-muted)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent placeholder:text-[var(--text-muted)] transition-all hover:bg-[var(--bg)] hover:text-[var(--primary)]"
+              >
+                <FaUserPlus className="mr-2" /> Register Student
+              </button>
+            </div>
+          
         </div>
 
         {/* Results */}

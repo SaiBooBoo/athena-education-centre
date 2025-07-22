@@ -63,6 +63,7 @@ const MainLayout = ({ children }) => {
           toggleSidebar={() => setSidebarExpanded(!sidebarExpanded)}
         />
         <main className="flex-grow p-6 pb-16 md:pb-6">{children}</main>
+
         <FooterComponent />
       </div>
     </div>

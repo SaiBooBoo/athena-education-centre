@@ -135,7 +135,7 @@ export default function ParentSearchComponent() {
                     </button>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
+                  <div className="grid  gap-2 mb-3 text-sm">
                     <div className="flex items-center">
                       <span className="icon mr-2 text-[var(--text-muted)]">📅</span>
                       <span>{p.dob}</span>
