@@ -1,6 +1,7 @@
 import { ChangeEvent, useState } from "react";
-import { Gender } from "../../modal/dtos/parent.dto";
+import { Gender, ParentType } from "../../modal/dtos/parent.dto";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function ParentRegistration() {
   const [formData, setFormData] = useState({
@@ -13,15 +14,15 @@ export default function ParentRegistration() {
     job: "",
     phoneNumber: "",
     address: "",
-    profileImagePath: "",
     accountType: "parent",
-    students: [],
-    parentType: "GUARDIAN", // Added to match expected backend field
+    students: [] as number[],
+    parentType: "" as ParentType, // Added to match expected backend field
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successParentId, setSuccessParentId] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -36,14 +37,19 @@ export default function ParentRegistration() {
     setError(null);
 
     try {
-      const parentPayload = { ...formData };
+      const parentPayload = { ...formData,
+        students: formData.students,
+       };
 
       const regResp = await axios.post(
         "http://localhost:8080/api/auth/register",
-        parentPayload
+        parentPayload,
+        { headers: {"Content-Type": "application/json"}}
       );
 
-      setSuccessParentId(regResp.data.id);
+      const parentId = regResp.data.id;
+      console.log("Parent registered:", regResp.data);
+      setSuccessParentId(parentId);
 
       // Reset form
       setFormData({
@@ -56,7 +62,6 @@ export default function ParentRegistration() {
         job: "",
         phoneNumber: "",
         address: "",
-        profileImagePath: "",
         accountType: "parent",
         students: [],
         parentType: "GUARDIAN", // Reset this too

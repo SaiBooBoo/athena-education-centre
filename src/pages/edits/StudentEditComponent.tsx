@@ -31,7 +31,9 @@ export default function StudentEditComponent() {
   const [hasProfileImage, setHasProfileImage] = useState(false);
   const [allParents, setAllParents] = useState<ParentSummaryDto[]>([]);
   const [parentSearch, setParentSearch] = useState("");
+  const [showModal, setShowModal] = useState(false);
   const [parentError, setParentError] = useState<string | null>(null);
+  
    useEffect(() => {
     if (!id) return;
 
