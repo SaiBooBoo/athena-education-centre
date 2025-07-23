@@ -8,7 +8,7 @@ interface TeacherSearchForm {
   nrcNumber: string;
   qualification: string;
   dob: string;
-  phone: string;
+  phoneNumber: string;
   gender: Gender;
   profileImagePath: string | null;
   subjects:string[];
@@ -177,7 +177,7 @@ export default function TeacherSearchComponent() {
                     </button>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
+                  <div className="grid gap-2 mb-3 text-sm">
                     <div className="flex items-center">
                       <span className="icon mr-2 text-[var(--text-muted)]">📅</span>
                       <span>{teacher.dob}</span>
@@ -190,7 +190,7 @@ export default function TeacherSearchComponent() {
                     </div>
                     <div className="flex items-center">
                       <span className="icon mr-2 text-[var(--text-muted)]">📱</span>
-                      <span>{teacher.phone}</span>
+                      <span>{teacher.phoneNumber}</span>
                     </div>
                     <div className="flex items-center">
                       <span className="icon mr-2 text-[var(--text-muted)]">🆔</span>

@@ -29,3 +29,8 @@ export type TeacherSummaryDto ={
   phone: string
   subject: string
 }
+
+export type SubjectDto ={
+  id: number;
+  subjectName: string
+}

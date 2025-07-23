@@ -16,7 +16,7 @@ export default function ParentRegistration() {
     address: "",
     accountType: "parent",
     students: [] as number[],
-    parentType: "" as ParentType, // Added to match expected backend field
+    parentType: "GUARDIAN" as ParentType, // Added to match expected backend field
   });
 
   const [loading, setLoading] = useState(false);
