@@ -69,7 +69,7 @@ export default function ParentSearchComponent() {
     </h2>
 
     {/* Filters */}
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 bg-[var(--bg-light)] p-4 rounded-xl border border-[var(--border-muted)] shadow-sm">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 bg-[var(--bg-light)] p-4 rounded-xl border border-[var(--border-muted)] shadow-sm">
       <input
         type="text"
         placeholder="Search Name…"

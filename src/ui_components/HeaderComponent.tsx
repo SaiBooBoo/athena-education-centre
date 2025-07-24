@@ -196,8 +196,8 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
                         {option}
                       </button>
                     ))}
-                    <button>
-                      <Link to="/login" className="block w-full text-left px-4 py-2 text-sm hover:bg-[var(--highlight)]">
+                    <button  className="block w-full text-left px-4 py-2 text-sm hover:bg-[var(--highlight)]">
+                      <Link to="/login" >
                         Logout
                       </Link>
                     </button>

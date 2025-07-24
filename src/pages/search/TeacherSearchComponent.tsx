@@ -95,7 +95,7 @@ export default function TeacherSearchComponent() {
     </h2>
 
     {/* Filters */}
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 bg-[var(--bg-light)] p-4 rounded-xl border border-[var(--border-muted)] shadow-sm">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 bg-[var(--bg-light)] p-4 rounded-xl border border-[var(--border-muted)] shadow-sm">
       <input
         type="text"
         placeholder="Search Name…"
@@ -191,7 +191,7 @@ export default function TeacherSearchComponent() {
                 <h3 className="text-xl font-bold text-[var(--primary)] max-w-[80%]">
                   {teacher.displayName}
                 </h3>
-                <button 
+                <button onClick={() => navigate(`/edit-teacher/${teacher.id}`)}
                   className="text-[var(--primary)] hover:text-[var(--secondary)] transition-colors"
                   title="Edit teacher"
                 >
