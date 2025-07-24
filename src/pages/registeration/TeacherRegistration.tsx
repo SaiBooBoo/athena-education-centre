@@ -1,8 +1,7 @@
-import { ChangeEvent, useEffect, useState } from "react"
+import { ChangeEvent, useState } from "react"
 import { Gender } from "../../modal/dtos/parent.dto"
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Subject } from "../../modal/dtos/student.dto";
 
 
 export default function TeacherRegistration() {
@@ -22,25 +21,8 @@ export default function TeacherRegistration() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successTeacherId, setSuccessTeacherId] = useState<number | null>(null);
-  const [subjects, setSubjects] = useState<Subject[]>([])
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchSubjects();
-  }, [subjects]);
-
-  const fetchSubjects = async () => {
-    setLoading(true);
-    setError(null);
-    try{
-      const res = await axios.get(`http://localhost:8080/api/subjects`)
-      setSubjects(res.data);
-    }catch (err: any) {
-      setError(err.response?.data?.message  || "Failed to load subjects.")
-    } finally {
-      setLoading(false);
-    }
-  }
 
 
 
@@ -86,7 +68,11 @@ export default function TeacherRegistration() {
       });
 
       setLoading(false);
+      if(successTeacherId !== null){
+        console.log(`Teacher successfully registered with ID: ${successTeacherId}`)
+      }
       navigate("/teacherDashboard");
+
     } catch (err: any) {
       setError(err.response?.data?.message || err.message);
       setLoading(false);

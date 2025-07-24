@@ -1,12 +1,22 @@
 import axios from "axios";
 import type { RegisterDto } from "../modal/dtos/register.dto";
 
-const ATHENA_API_BACKEND_URL = "http://localhost:8080/api/auth";
+export const ATHENA_API_BACKEND_URL = "http://localhost:8080/api/auth";
 
 export const login = (username:string, password:string) => { return axios.post(ATHENA_API_BACKEND_URL + "/login", {username, password})};
 
 export const register = (registerDto : RegisterDto) => { return axios.post(ATHENA_API_BACKEND_URL + "/register", registerDto)};
     
+export function useAuth(){
+    const username = sessionStorage.getItem("username");
+    const role = sessionStorage.getItem("role");
+    return {username, role };
+}
+
+export const fetchAccountType = async (username: string): Promise<string> => {
+  const response = await axios.get(`${ATHENA_API_BACKEND_URL}/accountType/${username}`);
+  return response.data;
+}
 
 
 export const setLoggedInUsername = (username:string) =>{
@@ -36,6 +46,8 @@ export const setLoggedUserRole = (role:string) => {
 export const getLoggedUserRole = () => {
     return sessionStorage.getItem("role");
 }
+
+
 
 export const isTeacher = () => {
     return getLoggedUserRole() === "ROLE_TEACHER";

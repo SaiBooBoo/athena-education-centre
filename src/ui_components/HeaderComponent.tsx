@@ -5,6 +5,13 @@ import {
 } from "react-icons/fi";
 import { FaUserCircle } from "react-icons/fa";
 import type { HeaderComponentProps } from "../props/HeaderCoponentProps";
+import {  ATHENA_API_BACKEND_URL, useAuth } from "../service/AuthService";
+import axios from "axios";
+
+export const fetchAccountType = async (username: string): Promise<string> => {
+  const response = await axios.get(`${ATHENA_API_BACKEND_URL}/accountType/${username}`);
+  return response.data;
+}
 
 export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: HeaderComponentProps) {
   const [darkMode, setDarkMode] = useState(false);
@@ -12,16 +19,33 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [academicYear, setAcademicYear] = useState("2024/2025");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [username, setUsername] = useState('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [accountType, setAccountType] = useState<string>("");
+  const {username} = useAuth();
 
-  useEffect(() => {
-    const storedUsername = localStorage.getItem('username');
-    if (storedUsername) {
-      setUsername(storedUsername);
-    }
-  }, []);
-  
-  
+
+  function capitalizeFirstLetter(name: string): string {
+  if (!name) return "";
+  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+}
+
+ useEffect(() => {
+    (async () => {
+       try {
+        setLoading(true);
+        const raw = await fetchAccountType(username);
+        // strip ROLE_, lowercase, then uppercase first char
+        const clean = raw.replace("ROLE_", "").toLowerCase();
+        setAccountType(clean.charAt(0).toUpperCase() + clean.slice(1));
+      } catch {
+        setError("Failed to fetch account type");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [username]);
+
   // Apply theme class to body
   useEffect(() => {
     if (darkMode) {
@@ -164,8 +188,9 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="px-4 py-3 border-b border-[var(--border-muted)]">
-                    <p className="text-sm font-medium text-[var(--text)]">{username}</p>
-                    <p className="text-xs text-[var(--text-muted)]">Administrator</p>
+                    <p className="text-sm font-medium text-[var(--text)]">{capitalizeFirstLetter(username ?? "")}</p>
+                   {/* AccounType Displayment */}
+                    <p className="text-xs text-[var(--text-muted)]">{accountType}</p>
                   </div>
                   <div className="py-1">
                     {profileOptions.map((option) => (
@@ -297,3 +322,4 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
     </nav>
   );
 }
+

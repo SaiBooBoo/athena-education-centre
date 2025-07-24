@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { setLoggedInUsername, setLoggedUserRole, setToken } from "../service/AuthService";
 import { login } from "../service/AuthService";
 
+
 export default function LoginComponent() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
   const navigate = useNavigate();
 
   const loginHandler = (e) => {
@@ -16,10 +18,13 @@ export default function LoginComponent() {
         const token = 'Basic ' + btoa(username + ":" + password);
         setToken(token);
         setLoggedInUsername(username);
-        setLoggedUserRole(res.data);
+        setLoggedUserRole(res.data.role)
+
         navigate("/help");
         window.location.reload();
       })
+
+      
       .catch(err => console.log(err));
   };
 
