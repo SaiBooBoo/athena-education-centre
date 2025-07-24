@@ -15,8 +15,10 @@ import {
   FaBriefcase,
   FaHome,
   FaUserTag,
-  FaChild
+  FaChild,
+  FaUserPlus
 } from 'react-icons/fa';
+import { Link, useNavigate } from "react-router-dom";
 
 type Parent = {
   id: number;
@@ -39,6 +41,7 @@ export default function ParentSearchComponent() {
   const [searchName, setSearchName] = useState('');
   const [searchId, setSearchId] = useState<number | ''>('');
   const [searchParentType, setSearchParentType] = useState<ParentType | ''>('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -91,7 +94,18 @@ export default function ParentSearchComponent() {
         <option value="MOTHER">Mother</option>
         <option value="GUARDIAN">Guardian</option>
       </select>
+
+       <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate("/registerParent")}
+              className="flex items-center bg-[var(--bg-light)] border border-[var(--border-muted)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent placeholder:text-[var(--text-muted)] transition-all hover:bg-[var(--bg)] hover:text-[var(--primary)]"
+            >
+              <FaUserPlus className="mr-2" /> Register Parent
+            </button>
+          </div>
+        </div>
     </div>
+    
 
     {/* Results */}
     {error ? (
@@ -140,12 +154,12 @@ export default function ParentSearchComponent() {
                 <h3 className="text-xl font-bold text-[var(--primary)] max-w-[80%]">
                   {p.displayName}
                 </h3>
-                <button 
-                  className="text-[var(--primary)] hover:text-[var(--secondary)] transition-colors"
-                  title="Edit parent"
-                >
-                  <FaEdit />
-                </button>
+                <Link to={`/edit-parent/${p.id}`} title="Edit parent">
+                  <button className="text-[var(--primary)] hover:text-[var(--secondary)] transition-colors">
+                    <FaEdit />
+                  </button>
+                </Link>
+                
               </div>
               
               <div className="grid gap-2 mb-3 text-sm">
@@ -227,6 +241,5 @@ export default function ParentSearchComponent() {
       </div>
     )}
   </div>
-</div>
   );
 }

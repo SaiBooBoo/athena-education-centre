@@ -5,13 +5,9 @@ import {
 } from "react-icons/fi";
 import { FaUserCircle } from "react-icons/fa";
 import type { HeaderComponentProps } from "../props/HeaderCoponentProps";
-import {  ATHENA_API_BACKEND_URL, useAuth } from "../service/AuthService";
-import axios from "axios";
+import { fetchAccountType, useAuth } from "../service/AuthService";
+import { Link } from "react-router-dom";
 
-export const fetchAccountType = async (username: string): Promise<string> => {
-  const response = await axios.get(`${ATHENA_API_BACKEND_URL}/accountType/${username}`);
-  return response.data;
-}
 
 export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: HeaderComponentProps) {
   const [darkMode, setDarkMode] = useState(false);
@@ -21,7 +17,7 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [accountType, setAccountType] = useState<string>("");
+  const [accountType, setAccountType] = useState<string | null>(null);
   const {username} = useAuth();
 
 
@@ -31,20 +27,12 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
 }
 
  useEffect(() => {
-    (async () => {
-       try {
-        setLoading(true);
-        const raw = await fetchAccountType(username);
-        // strip ROLE_, lowercase, then uppercase first char
-        const clean = raw.replace("ROLE_", "").toLowerCase();
-        setAccountType(clean.charAt(0).toUpperCase() + clean.slice(1));
-      } catch {
-        setError("Failed to fetch account type");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [username]);
+  if(username) {
+    fetchAccountType(username)
+    .then(setAccountType)
+    .catch(() => setAccountType("UNKNOWN"))
+  }
+ }, [username])
 
   // Apply theme class to body
   useEffect(() => {
@@ -58,7 +46,7 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
   }, [darkMode]);
 
   const academicYears = ["2024/2025", "2023/2024", "2022/2023", "2021/2022"];
-  const profileOptions = ["My Profile", "Settings", "Logout"];
+  const profileOptions = ["My Profile", "Settings"];
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -70,6 +58,13 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
+
+  if(loading || error) {
+    return {
+      loading: true,
+      error: "Loading..."
+    }
+  }
 
   return (
     <nav 
@@ -190,7 +185,7 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
                   <div className="px-4 py-3 border-b border-[var(--border-muted)]">
                     <p className="text-sm font-medium text-[var(--text)]">{capitalizeFirstLetter(username ?? "")}</p>
                    {/* AccounType Displayment */}
-                    <p className="text-xs text-[var(--text-muted)]">{accountType}</p>
+                    <p className="text-xs text-[var(--text-muted)]">Role: <strong>{accountType?.replace("ROLE_", "")}</strong></p>
                   </div>
                   <div className="py-1">
                     {profileOptions.map((option) => (
@@ -201,6 +196,11 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
                         {option}
                       </button>
                     ))}
+                    <button>
+                      <Link to="/login" className="block w-full text-left px-4 py-2 text-sm hover:bg-[var(--highlight)]">
+                        Logout
+                      </Link>
+                    </button>
                   </div>
                 </div>
               )}

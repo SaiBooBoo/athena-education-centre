@@ -1,3 +1,4 @@
+import { Gender } from "./parent.dto"
 
 export type SignInForm = {
     name : string
@@ -7,6 +8,8 @@ export type StudentSummaryDto ={
   id:number
   username: string
   displayName: string
+  dob: string
+  gender: Gender
   grade: number
   profileImagePath: string
 }

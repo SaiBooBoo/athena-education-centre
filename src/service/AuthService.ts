@@ -14,8 +14,13 @@ export function useAuth(){
 }
 
 export const fetchAccountType = async (username: string): Promise<string> => {
-  const response = await axios.get(`${ATHENA_API_BACKEND_URL}/accountType/${username}`);
-  return response.data;
+   try {
+    const res = await axios.get(`http://localhost:8080/api/auth/accountType/${username}`);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching account type", error);
+    throw error;
+  }
 }
 
 

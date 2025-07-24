@@ -31,8 +31,8 @@ export default function StudentEditComponent() {
   const [hasProfileImage, setHasProfileImage] = useState(false);
   const [allParents, setAllParents] = useState<ParentSummaryDto[]>([]);
   const [parentSearch, setParentSearch] = useState("");
-  const [showModal, setShowModal] = useState(false);
   const [parentError, setParentError] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   
    useEffect(() => {
     if (!id) return;
@@ -66,6 +66,14 @@ export default function StudentEditComponent() {
     })
   }, [id]);
   
+  useEffect(() => {
+    return () => {
+      if(imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    }
+  }, [imagePreview]);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const {name, value} = e.target;
     setFormData((prev) => ({
@@ -76,7 +84,10 @@ export default function StudentEditComponent() {
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if(e.target.files && e.target.files[0]){
-      setProfileImage(e.target.files[0])
+      const file = e.target.files[0];
+      setProfileImage(file);
+
+      setImagePreview(URL.createObjectURL(file));
     }
   }
 
@@ -85,7 +96,6 @@ export default function StudentEditComponent() {
       alert("Please select at least one parent.");
       return;
     }
-
      setParentError(null); // Clear error if parents are selected
     try{
       const response = await axios.put(`http://localhost:8080/api/students/addParents/${id}`,
@@ -93,7 +103,6 @@ export default function StudentEditComponent() {
           parents: formData.parents.map(parent => ({id: parent.id}))
         }
       );
-
       console.log("Parents added successfull:", response.data);
       alert("Parents added successfully!");
     } catch (error: any) {
@@ -153,34 +162,40 @@ export default function StudentEditComponent() {
 
     <form onSubmit={handleSubmit} className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Left Column - Profile Photo */}
-      <div className="lg:col-span-1 flex flex-col items-center">
-        <div className="relative mb-6">
-          {hasProfileImage ? (
-            <img 
-              src={`http://localhost:8080/api/students/${id}/profile-image`}
-              alt="Profile"
-              className="w-64 h-64 object-cover rounded-xl shadow-lg border-4 border-bg ring-4 ring-primary/20"
-            />
-          ) : (
-            <div className="bg-bg border-2 border-dashed border-highlight rounded-xl w-64 h-64 flex items-center justify-center">
-              <span className="text-text-muted">No Image</span>
-            </div>
-          )}
-          
-          <label 
-            htmlFor="profileImage"
-            className="absolute -bottom-2 -right-2 bg-primary text-bg-dark p-3 rounded-full shadow-xl cursor-pointer hover:bg-highlight transition-all transform hover:scale-105 ring-2 ring-bg"
-          >
-            <FaCamera className="text-xl" />
-            <input 
-              type="file" 
-              id="profileImage" 
-              className="hidden" 
-              onChange={handleFileChange} 
-              accept="image/*"
-            />
-          </label>
-        </div>
+     <div className="lg:col-span-1 flex flex-col items-center">
+  <div className="relative mb-6">
+    {imagePreview ? (
+      <img 
+        src={imagePreview}
+        alt="Profile Preview"
+        className="w-64 h-64 object-cover rounded-xl shadow-lg border-4 border-bg ring-4 ring-primary/20"
+      />
+    ) : hasProfileImage ? (
+      <img 
+        src={`http://localhost:8080/api/students/${id}/profile-image`}
+        alt="Profile"
+        className="w-64 h-64 object-cover rounded-xl shadow-lg border-4 border-bg ring-4 ring-primary/20"
+      />
+    ) : (
+      <div className="bg-bg border-2 border-dashed border-highlight rounded-xl w-64 h-64 flex items-center justify-center">
+        <span className="text-text-muted">No Image</span>
+      </div>
+    )}
+    
+    <label 
+      htmlFor="profileImage"
+      className="absolute -bottom-2 -right-2 bg-primary text-bg-dark p-3 rounded-full shadow-xl cursor-pointer hover:bg-highlight transition-all transform hover:scale-105 ring-2 ring-bg"
+    >
+      <FaCamera className="text-xl" />
+      <input 
+        type="file" 
+        id="profileImage" 
+        className="hidden" 
+        onChange={handleFileChange} 
+        accept="image/*"
+      />
+    </label>
+  </div>
         
         <div className="text-center mt-4 bg-bg p-4 rounded-xl shadow-inner border border-highlight/20 w-full">
           <p className="font-bold text-xl text-text">{formData.displayName}</p>

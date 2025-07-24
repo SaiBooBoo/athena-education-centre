@@ -10,6 +10,8 @@ import {
   FaPhone,
   FaIdCard
 } from 'react-icons/fa';
+import { FaUserPlus } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 
 interface TeacherSearchForm {
   id: number;
@@ -38,7 +40,7 @@ export default function TeacherSearchComponent() {
   const [searchId, setSearchId] = useState<number | "">("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   const BACKEND_URL = "http://localhost:8080/api";
 
   useEffect(() => {
@@ -131,6 +133,16 @@ export default function TeacherSearchComponent() {
           </option>
         ))}
       </select>
+
+       <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => navigate("/registerParent")}
+                    className="flex items-center bg-[var(--bg-light)] border border-[var(--border-muted)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent placeholder:text-[var(--text-muted)] transition-all hover:bg-[var(--bg)] hover:text-[var(--primary)]"
+                  >
+                    <FaUserPlus className="mr-2" /> Register Teacher
+                  </button>
+                </div>
+              
     </div>
 
     {error ? (
