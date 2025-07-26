@@ -13,7 +13,7 @@ import {
 import { FaUserPlus } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
-interface TeacherSearchForm {
+export interface TeacherSearchForm {
   id: number;
   displayName: string;
   nrcNumber: string;
@@ -155,9 +155,9 @@ export default function TeacherSearchComponent() {
       </div>
     ) : searchFiltered.length === 0 ? (
       <div className="text-center py-12 bg-[var(--bg-light)] rounded-xl border border-[var(--border)]">
-        <div className="text-5xl mb-4 text-[var(--text-muted)]">
-          <FaChalkboardTeacher />
-        </div>
+       <div className="flex justify-center mb-4">
+           <FaChalkboardTeacher className="text-5xl text-[var(--text-muted)]" />
+       </div>
         <p className="text-xl text-[var(--text-muted)]">No teachers match your filters</p>
       </div>
     ) : (

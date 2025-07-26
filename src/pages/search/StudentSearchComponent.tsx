@@ -126,8 +126,8 @@ export default function StudentSearchComponent() {
       </div>
     ) : filtered.length === 0 ? (
       <div className="text-center py-12 bg-[var(--bg-light)] rounded-xl border border-[var(--border)]">
-        <div className="text-5xl mb-4 text-[var(--text-muted)]">
-          <FaUserGraduate />
+        <div className="flex justify-center mb-4">
+          <FaUserGraduate className="text-5xl text-[var(--text-muted)]" />
         </div>
         <p className="text-xl text-[var(--text-muted)]">No students match your filters</p>
       </div>

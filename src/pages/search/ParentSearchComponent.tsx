@@ -1,245 +1,246 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import { ParentType } from "../../modal/dtos/parent.dto";
-import { Gender, Student } from "../../modal/dtos/student.dto";
-import { BACKEND_URL } from "../../service/ParentService";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { 
-  FaUsers,
-  FaMale,
-  FaFemale,
-  FaUser,
-  FaEdit,
-  FaCalendarAlt,
-  FaPhone,
-  FaIdCard,
-  FaBriefcase,
-  FaHome,
-  FaUserTag,
-  FaChild,
-  FaUserPlus
-} from 'react-icons/fa';
-import { Link, useNavigate } from "react-router-dom";
 
-type Parent = {
+interface Subject {
+  id: number;
+  subjectName: string;
+}
+
+interface TeacherSearchForm {
   id: number;
   displayName: string;
-  nrcNumber: string;
-  dob: string;
-  job: string;
-  gender: Gender;
-  phoneNumber: string;
-  address: string;
-  profileImagePath: string | null;
-  parentType: ParentType;
-  students: Student[];
-};
+  phone: string;
+}
 
-export default function ParentSearchComponent() {
-  const [parents, setParents] = useState<Parent[]>([]);
+export default function SubjectsComponent() {
+  const BACKEND_URL = "http://localhost:8080/api";
+  const [formData, setFormData] = useState({ subjectName: "" });
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [searchName, setSearchName] = useState('');
-  const [searchId, setSearchId] = useState<number | ''>('');
-  const [searchParentType, setSearchParentType] = useState<ParentType | ''>('');
-  const navigate = useNavigate();
+  const [teachers, setTeachers] = useState<TeacherSearchForm[]>([]);
+  const [filteredTeachers, setFilteredTeachers] = useState<TeacherSearchForm[]>([]);
+  const [successSubjectId, setSuccessSubjectId] = useState<number | null>(null);
+  const [searchName, setSearchName] = useState("");
+  const [searchId, setSearchId] = useState<number | "">("");
+  const [selectedTeacherId, setSelectedTeacherId] = useState<number | null>(null);
+  const [teacherSubjects, setTeacherSubjects] = useState<Subject[]>([]);
 
   useEffect(() => {
-    setLoading(true);
-    axios.get<Parent[]>(`${BACKEND_URL}`)
-      .then(res => setParents(res.data))
-      .catch(err => setError(err.message || "Unknown error"))
-      .finally(() => setLoading(false));
+    console.log("Component mounted");
+    fetchSubjects();
+    fetchTeachers();
   }, []);
 
-  const filtered = parents.filter(p => {
-    if (searchName && !p.displayName.toLowerCase().includes(searchName.toLowerCase()))
-      return false;
-    if (searchId !== '' && p.id !== searchId)
-      return false;
-    if (searchParentType !== '' && p.parentType !== searchParentType)
-      return false;
-    return true;
-  });
+  const fetchTeachers = async () => {
+    console.log("Fetching teachers");
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axios.get<TeacherSearchForm[]>(`${BACKEND_URL}/teachers`);
+      setTeachers(res.data);
+      setFilteredTeachers(res.data);
+      console.log("Teachers loaded:", res.data);
+    } catch (err: any) {
+      console.error("Failed to load teachers:", err);
+      setError(err.response?.data?.message || "Failed to load teachers.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSubjects = async () => {
+    console.log("Fetching subjects");
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axios.get(`${BACKEND_URL}/subjects`);
+      setSubjects(res.data);
+      console.log("Subjects loaded:", res.data);
+    } catch (err: any) {
+      console.error("Failed to load subjects:", err);
+      setError(err.response?.data?.message || "Failed to load subjects.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTeacherSubjects = async (teacherId: number) => {
+    console.log("Fetching subjects for teacher:", teacherId);
+    try {
+      const res = await axios.get<Subject[]>(`${BACKEND_URL}/teachers/subjects/${teacherId}`);
+      setTeacherSubjects(res.data);
+      console.log("Teacher subjects:", res.data);
+    } catch (err: any) {
+      console.error("Failed to fetch teacher subjects:", err);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      console.log("Creating subject:", formData.subjectName);
+      const res = await axios.post(
+        `${BACKEND_URL}/subjects?subjectName=${formData.subjectName}`,
+        null,
+        { headers: { "Content-Type": "application/json" } }
+      );
+      const newSubject = res.data;
+      setSuccessSubjectId(newSubject.id);
+      setFormData({ subjectName: "" });
+      setSubjects((prev) => [...prev, newSubject]);
+      console.log("Subject created:", newSubject);
+    } catch (err: any) {
+      console.error("Failed to create subject:", err);
+      setError(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteSubject = async (id: number) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this subject?");
+    if (!confirmDelete) return;
+
+    try {
+      console.log("Deleting subject with ID:", id);
+      await axios.delete(`${BACKEND_URL}/subjects/${id}`);
+      setSubjects(subjects.filter((subject) => subject.id !== id));
+      console.log("Subject deleted successfully");
+    } catch (err: any) {
+      console.error("Delete failed:", err);
+      setError(err.response?.data?.message || "Failed to delete subject.");
+    }
+  };
+
+  const handleAddSubjectToTeacher = async (teacherId: number, subjectId: number) => {
+    console.log(`Adding subject ${subjectId} to teacher ${teacherId}`);
+    try {
+      await axios.post(`${BACKEND_URL}/teachers/${teacherId}/subjects/${subjectId}`);
+      fetchTeacherSubjects(teacherId);
+      console.log("Subject added to teacher successfully");
+    } catch (err: any) {
+      console.error("Failed to add subject to teacher:", err);
+    }
+  };
+
+  const handleSearch = () => {
+    console.log("Searching teachers by name and ID");
+    const filtered = teachers.filter(
+      (teacher) =>
+        teacher.displayName.toLowerCase().includes(searchName.toLowerCase()) &&
+        (searchId === "" || teacher.id === Number(searchId))
+    );
+    setFilteredTeachers(filtered);
+    console.log("Search results:", filtered);
+  };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-[var(--bg)] text-[var(--text)]">
-  <div className="max-w-8xl mx-auto">
-    <h2 className="text-2xl md:text-3xl font-bold mb-6 text-[var(--primary)] border-b border-[var(--border)] pb-3">
-      Parent Search
-    </h2>
-
-    {/* Filters */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 bg-[var(--bg-light)] p-4 rounded-xl border border-[var(--border-muted)] shadow-sm">
-      <input
-        type="text"
-        placeholder="Search Name…"
-        value={searchName}
-        onChange={e => setSearchName(e.target.value)}
-        className="bg-[var(--bg-light)] border border-[var(--border-muted)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent placeholder:text-[var(--text-muted)] transition-all"
-      />
-      <input 
-        type="number" 
-        placeholder="Search ID…" 
-        value={searchId} 
-        onChange={e => setSearchId(e.target.value === "" ? "" : Number(e.target.value))}
-        className="bg-[var(--bg-light)] border border-[var(--border-muted)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent placeholder:text-[var(--text-muted)] transition-all"
-      />
-      <select 
-        value={searchParentType} 
-        onChange={(e: ChangeEvent<HTMLSelectElement>) => setSearchParentType(e.target.value as ParentType)} 
-        className="bg-[var(--bg-light)] border border-[var(--border-muted)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent text-[var(--text)] appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5bGluZSBwb2ludHM9IjYgOSAxMiAxNSAxOCA5Ij48L3BvbHlsaW5lPjwvc3ZnPg==')] bg-no-repeat bg-[right_1rem_center]"
-      >
-        <option value="">All Parent Types</option>
-        <option value="FATHER">Father</option>
-        <option value="MOTHER">Mother</option>
-        <option value="GUARDIAN">Guardian</option>
-      </select>
-
-       <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate("/registerParent")}
-              className="flex items-center bg-[var(--bg-light)] border border-[var(--border-muted)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent placeholder:text-[var(--text-muted)] transition-all hover:bg-[var(--bg)] hover:text-[var(--primary)]"
-            >
-              <FaUserPlus className="mr-2" /> Register Parent
-            </button>
-          </div>
-        </div>
-    </div>
-    
-
-    {/* Results */}
-    {error ? (
-      <div className="bg-[var(--danger)]/20 border border-[var(--danger)] text-[var(--danger)] p-4 rounded-lg text-center">
-        Error: {error}
-      </div>
-    ) : loading ? (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--primary)]"></div>
-      </div>
-    ) : filtered.length === 0 ? (
-      <div className="text-center py-12 bg-[var(--bg-light)] rounded-xl border border-[var(--border)]">
-        <div className="text-5xl mb-4 text-[var(--text-muted)]">
-          <FaUsers />
-        </div>
-        <p className="text-xl text-[var(--text-muted)]">No parents match your filters</p>
-      </div>
-    ) : (
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {filtered.map(p => (
-          <div 
-            key={p.id} 
-            className="bg-[var(--bg-light)] rounded-2xl overflow-hidden flex flex-col border border-[var(--border)] shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold">Create Subject</h2>
+        <form onSubmit={handleSubmit} className="space-y-2">
+          <input
+            type="text"
+            value={formData.subjectName}
+            onChange={(e) => setFormData({ subjectName: e.target.value })}
+            placeholder="Enter Teacher ID"
+            className="border px-3 py-2 w-full"
+          />
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+            disabled={loading}
           >
-            <div className="h-48 bg-[var(--bg)] flex-shrink-0 relative">
-              {p.profileImagePath ? (
-                <img
-                  src={`${BACKEND_URL}/${p.id}/image`}
-                  alt={p.displayName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-[var(--text-muted)] bg-gradient-to-br from-[var(--bg-dark)] to-[var(--bg)]">
-                  <div className="text-6xl opacity-50">
-                    {p.gender === 'MALE' ? <FaMale /> : p.gender === 'FEMALE' ? <FaFemale /> : <FaUser />}
-                  </div>
-                </div>
-              )}
-              <div className="absolute top-3 right-3 bg-[var(--primary)] text-white text-sm font-medium px-3 py-1 rounded-full">
-                #{p.id}
-              </div>
-            </div>
+            {loading ? "Saving..." : "Save Subject"}
+          </button>
+        </form>
 
-            <div className="p-5 flex flex-col flex-grow">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-xl font-bold text-[var(--primary)] max-w-[80%]">
-                  {p.displayName}
-                </h3>
-                <Link to={`/edit-parent/${p.id}`} title="Edit parent">
-                  <button className="text-[var(--primary)] hover:text-[var(--secondary)] transition-colors">
-                    <FaEdit />
-                  </button>
-                </Link>
-                
-              </div>
-              
-              <div className="grid gap-2 mb-3 text-sm">
-                <div className="flex items-center">
-                  <span className="icon mr-2 text-[var(--text-muted)]">
-                    <FaCalendarAlt />
-                  </span>
-                  <span>{p.dob}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="icon mr-2 text-[var(--text-muted)]">
-                    {p.gender === 'MALE' ? <FaMale /> : <FaFemale />}
-                  </span>
-                  <span>{p.gender}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="icon mr-2 text-[var(--text-muted)]">
-                    <FaPhone />
-                  </span>
-                  <span>{p.phoneNumber}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="icon mr-2 text-[var(--text-muted)]">
-                    <FaIdCard />
-                  </span>
-                  <span>{p.nrcNumber}</span>
-                </div>
-              </div>
-              
-              <div className="mt-auto space-y-2 pt-3 border-t border-[var(--border-muted)]">
-                <div className="flex items-center">
-                  <span className="icon mr-2 text-[var(--text-muted)]">
-                    <FaBriefcase />
-                  </span>
-                  <span className="font-medium">Job:</span>
-                  <span className="ml-1">{p.job}</span>
-                </div>
-                
-                <div className="flex items-start">
-                  <span className="icon mr-2 text-[var(--text-muted)]">
-                    <FaHome />
-                  </span>
-                  <span className="font-medium">Address:</span>
-                  <span className="ml-1 flex-1">{p.address}</span>
-                </div>
-                
-                <div className="flex items-center">
-                  <span className="icon mr-2 text-[var(--text-muted)]">
-                    <FaUserTag />
-                  </span>
-                  <span className="font-medium">Relation:</span>
-                  <span className="ml-1 bg-[var(--primary)]/20 text-[var(--primary)] px-2 py-1 rounded-full text-xs">
-                    {p.parentType}
-                  </span>
-                </div>
-                
-                <div className="mt-2">
-                  <p className="font-medium text-[var(--text-muted)] flex items-center">
-                    <span className="icon mr-2">
-                      <FaChild />
-                    </span> 
-                    Children:
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {p.students.map(student => (
-                      <span 
-                        key={student.id} 
-                        className="bg-[var(--success)]/20 text-[var(--success)] border border-[var(--success)]/30 text-xs px-2 py-1 rounded-full"
-                      >
-                        {student.displayName}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+        {error && <p className="text-red-500">{error}</p>}
+        {successSubjectId && (
+          <p className="text-green-600">Subject created successfully! ID: {successSubjectId}</p>
+        )}
+
+        <h3 className="font-semibold mt-6">All Subjects</h3>
+        <ul className="space-y-2">
+          {subjects.map((subject) => (
+            <li key={subject.id} className="flex justify-between items-center border p-2 rounded">
+              <span>{subject.subjectName}</span>
+              <button
+                onClick={() => handleDeleteSubject(subject.id)}
+                className="bg-red-500 text-white px-3 py-1 rounded"
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
-    )}
-  </div>
+
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold">Assign Subjects to Teacher</h2>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Search by name"
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+            className="border px-3 py-2 w-full"
+          />
+          <input
+            type="number"
+            placeholder="Search by ID"
+            value={searchId}
+            onChange={(e) => setSearchId(e.target.value === "" ? "" : Number(e.target.value))}
+            className="border px-3 py-2 w-full"
+          />
+          <button onClick={handleSearch} className="bg-gray-500 text-white px-3 py-2 rounded">
+            Search
+          </button>
+        </div>
+
+        <ul className="space-y-4">
+          {filteredTeachers.map((teacher) => (
+            <li key={teacher.id} className="border p-4 rounded">
+              <h4 className="font-semibold">{teacher.displayName}</h4>
+              <p className="text-sm text-gray-600">Phone: {teacher.phone}</p>
+              <button
+                className="text-blue-600 underline mt-2"
+                onClick={() => {
+                  setSelectedTeacherId(teacher.id);
+                  fetchTeacherSubjects(teacher.id);
+                }}
+              >
+                View Subjects
+              </button>
+
+              {selectedTeacherId === teacher.id && (
+                <ul className="mt-2 space-y-1">
+                  {subjects.map((subject) => {
+                    const isAdded = teacherSubjects.some((s) => s.id === subject.id);
+                    return (
+                      <li key={subject.id} className="flex justify-between">
+                        <span>{subject.subjectName}</span>
+                        <button
+                          onClick={() => handleAddSubjectToTeacher(teacher.id, subject.id)}
+                          disabled={isAdded}
+                          className={`px-2 py-1 rounded text-white ${
+                            isAdded ? "bg-green-600" : "bg-blue-600 hover:bg-blue-700"
+                          }`}
+                        >
+                          {isAdded ? "Added" : "Add"}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }

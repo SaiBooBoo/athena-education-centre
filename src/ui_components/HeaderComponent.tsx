@@ -183,7 +183,7 @@ export default function HeaderComponent({ isSidebarExpanded, toggleSidebar }: He
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="px-4 py-3 border-b border-[var(--border-muted)]">
-                    <p className="text-sm font-medium text-[var(--text)]">{capitalizeFirstLetter(username ?? "")}</p>
+                    <p className="text-sm font-medium text-[var(--text)]"><strong>{capitalizeFirstLetter(username ?? "")}</strong></p>
                    {/* AccounType Displayment */}
                     <p className="text-xs text-[var(--text-muted)]">Role: <strong>{accountType?.replace("ROLE_", "")}</strong></p>
                   </div>

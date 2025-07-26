@@ -1,36 +1,68 @@
-import axios from "axios";
 import { ChangeEvent, useEffect, useState } from "react";
+import axios from "axios";
+import { TeacherSearchForm } from "../search/TeacherSearchComponent";
 
-// Type definition for a subject
-type Subject = {
+
+interface Subject {
   id: number;
   subjectName: string;
-};
+}
 
 export default function SubjectsComponent() {
   const [formData, setFormData] = useState({ subjectName: "" });
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [teachers, setTeachers] = useState<TeacherSearchForm[]>([]);
+  const [filteredTeachers, setFilteredTeachers] = useState<TeacherSearchForm[]>([]);
+  const [assignedSubjects, setAssignedSubjects] = useState<Subject[]>([]);
+  const [selectedTeacherId, setSelectedTeacherId] = useState<number | null>(null);
+  const [searchName, setSearchName] = useState("");
+  const [searchId, setSearchId] = useState<number | "">("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successSubjectId, setSuccessSubjectId] = useState<number | null>(null);
 
-   const BACKEND_URL = "http://localhost:8080/api/subjects";
+  const BACKEND_URL = "http://localhost:8080/api/subjects";
 
-  // Load subjects on component mount
   useEffect(() => {
     fetchSubjects();
+    fetchTeachers();
   }, []);
 
+  useEffect(() => {
+    const filtered = teachers.filter((teacher) => {
+      return (
+        teacher.displayName.toLowerCase().includes(searchName.toLowerCase()) &&
+        (searchId === "" || teacher.id.toString().includes(searchId.toString()))
+      );
+    });
+    setFilteredTeachers(filtered);
+  }, [searchName, searchId, teachers]);
+
+  useEffect(() => {
+    if (selectedTeacherId) {
+      axios
+        .get<Subject[]>(`http://localhost:8080/api/teachers/subjects/${selectedTeacherId}`)
+        .then((res) => setAssignedSubjects(res.data))
+        .catch(() => setAssignedSubjects([]));
+    }
+  }, [selectedTeacherId]);
+
+  const fetchTeachers = async () => {
+    try {
+      const res = await axios.get<TeacherSearchForm[]>(`http://localhost:8080/api/teachers`);
+      setTeachers(res.data);
+      setFilteredTeachers(res.data);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to load teachers.");
+    }
+  };
+
   const fetchSubjects = async () => {
-    setLoading(true);
-    setError(null);
     try {
       const res = await axios.get(BACKEND_URL);
       setSubjects(res.data);
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to load subjects.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -49,8 +81,6 @@ export default function SubjectsComponent() {
       const newSubject = regResp.data;
       setSuccessSubjectId(newSubject.id);
       setFormData({ subjectName: "" });
-
-      // Add new subject to list
       setSubjects((prev) => [...prev, newSubject]);
     } catch (err: any) {
       setError(err.response?.data?.message || err.message);
@@ -65,14 +95,46 @@ export default function SubjectsComponent() {
 
     try {
       await axios.delete(`${BACKEND_URL}/${id}`);
-      setSubjects(subjects.filter(subject => subject.id !== id));
+      setSubjects(subjects.filter((subject) => subject.id !== id));
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to delete subject.");
+      setError(
+        err.response?.data?.message ||
+          "There are teachers teaching this subject. You cannot remove it."
+      );
+    }
+  };
+
+  const handleAddSubject = async (teacherId: number, subjectId: number) => {
+    try {
+      await axios.post(`http://localhost:8080/api/teachers/${teacherId}/subjects/${subjectId}`);
+      if (selectedTeacherId) {
+        const res = await axios.get<Subject[]>(
+          `http://localhost:8080/api/teachers/subjects/${selectedTeacherId}`
+        );
+        setAssignedSubjects(res.data);
+      }
+    } catch (err) {
+      console.error("Failed to add subject to teacher.", err);
+    }
+  };
+
+  const handleRemoveSubject = async (teacherId: number, subjectId: number) => {
+    try {
+      await axios.delete(`http://localhost:8080/api/teachers/${teacherId}/subjects/${subjectId}`);
+      if (selectedTeacherId) {
+        const res = await axios.get<Subject[]>(
+          `http://localhost:8080/api/teachers/subjects/${selectedTeacherId}`
+        );
+        setAssignedSubjects(res.data);
+      }
+    } catch (err) {
+      console.error("Failed to remove subject from teacher.", err);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+      {/* Left: Subject creation and listing */}
       <div className="border p-4 rounded shadow-sm">
         <h2 className="text-xl font-bold mb-4">Create Subject</h2>
 
@@ -86,14 +148,10 @@ export default function SubjectsComponent() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             type="text"
-            label="Subject Name"
-            name="subjectName"
+            placeholder="Subject Name"
             value={formData.subjectName}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, subjectName: e.target.value }))
-            }
+            onChange={(e) => setFormData({ subjectName: e.target.value })}
           />
-
           <button
             type="submit"
             disabled={loading}
@@ -102,14 +160,8 @@ export default function SubjectsComponent() {
             {loading ? "Saving..." : "Save Subject"}
           </button>
         </form>
-      </div>
 
-      <div className="border p-4 rounded shadow-sm">
-        <h2 className="text-xl font-bold mb-4">All Subjects</h2>
-
-        {loading && <p>Loading...</p>}
-        {!loading && subjects.length === 0 && <p>No subjects found.</p>}
-
+        <h3 className="text-lg font-semibold mt-6 mb-2">All Subjects</h3>
         <ul className="space-y-2">
           {subjects.map((subject) => (
             <li
@@ -127,12 +179,79 @@ export default function SubjectsComponent() {
           ))}
         </ul>
       </div>
+
+      {/* Right: Assign subjects to teachers */}
+      <div className="border p-4 rounded shadow-sm">
+        <h2 className="text-xl font-bold mb-4">Assign Subjects to Teachers</h2>
+
+        <div className="flex gap-2 mb-4">
+          <Input
+            type="text"
+            placeholder="Search by name"
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+          />
+          <Input
+            type="number"
+            placeholder="Search by ID"
+            value={searchId}
+            onChange={(e) => setSearchId(e.target.value === "" ? "" : Number(e.target.value))}
+          />
+        </div>
+
+        <ul className="space-y-2">
+          {filteredTeachers.map((teacher) => (
+            <li
+              key={teacher.id}
+              onClick={() => setSelectedTeacherId(teacher.id)}
+              className={`border px-3 py-2 rounded cursor-pointer hover:bg-gray-100 ${
+                selectedTeacherId === teacher.id ? "bg-gray-100 font-semibold" : ""
+              }`}
+            >
+              {teacher.displayName} (ID: {teacher.id})
+            </li>
+          ))}
+        </ul>
+
+        {selectedTeacherId && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-2">Subjects Taught</h3>
+            <ul className="space-y-1">
+              {assignedSubjects.map((subj) => (
+                <li key={subj.id} className="flex justify-between items-center">
+                  <span>{subj.subjectName}</span>
+                  <button
+                    onClick={() => handleRemoveSubject(selectedTeacherId, subj.id)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">Assign New Subject</h3>
+            <ul className="space-y-1">
+              {subjects.map((subj) => (
+                <li key={subj.id} className="flex justify-between items-center">
+                  <span>{subj.subjectName}</span>
+                  <button
+                    onClick={() => handleAddSubject(selectedTeacherId, subj.id)}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Add
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-// Reusable input component
-function Input({
+export function Input({
   label,
   name,
   value,
