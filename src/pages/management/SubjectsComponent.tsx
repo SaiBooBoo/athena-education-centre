@@ -133,7 +133,9 @@ export default function SubjectsComponent() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+    <section>
+      <h1 className="text-2xl font-bold mb-4">Subjects Management</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
       {/* Left: Subject creation and listing */}
       <div className="border p-4 rounded shadow-sm">
         <h2 className="text-xl font-bold mb-4">Create Subject</h2>
@@ -248,6 +250,8 @@ export default function SubjectsComponent() {
         )}
       </div>
     </div>
+    </section>
+    
   );
 }
 
@@ -273,6 +277,7 @@ export function Input({
         value={value}
         onChange={onChange}
         required
+        placeholder="Enter subject name"
         className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
       />
     </div>
