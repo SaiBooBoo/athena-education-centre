@@ -260,8 +260,8 @@ export function Input({
 }: {
   label: string;
   name: string;
-  value: string;
-  type?: string;
+  value?: string | number;
+  type?: string | undefined;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
@@ -273,7 +273,6 @@ export function Input({
         value={value}
         onChange={onChange}
         required
-        placeholder="Enter subject name"
         className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
       />
     </div>
