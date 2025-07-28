@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Gender, ParentType } from "../../modal/dtos/parent.dto";
 import { StudentSummaryDto } from "../../modal/dtos/dtos";
 import axios from "axios";
-import { FaCamera, FaSearch, FaUser, FaMale, FaFemale, FaBook, FaCheck, FaPlus, FaMinus } from "react-icons/fa";
+import { FaCamera, FaSearch, FaUser, FaMale, FaFemale, FaBook, FaCheck, FaPlus, FaMinus, FaEdit } from "react-icons/fa";
 
 export default function ParentEditComponent() {
   const {id} = useParams<{id: string}>();
@@ -154,7 +154,7 @@ export default function ParentEditComponent() {
   if(error) return <p className="text-danger text-center py-8">{error}</p>;
 
   return (
-    <div className="min-h-screen p-6 bg-bg">
+    <div className="mt-4 bg-[var(--bg-dark)] rounded-xl shadow-md min-h-screen p-6 bg-bg">
       {/* Success Message Banner */}
       {successMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-success text-white px-4 py-2 rounded-md shadow-lg z-50">
@@ -162,11 +162,11 @@ export default function ParentEditComponent() {
         </div>
       )}
       
-      <h1 className="text-2xl font-bold text-text mb-6">Edit Parent Profile</h1>
+      <h1 className="text-2xl font-bold text-text mb-6 flex items-center"><FaEdit className="mr-2"/>Edit Parent Profile</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column - Profile Picture */}
-        <div className="lg:col-span-1">
+        <div className=" lg:col-span-1">
           <div className="bg-[var(--bg-light)] rounded-xl shadow-md p-6 border border-border-muted">
             <div className="relative mb-6">
               {imagePreview ? (
@@ -211,7 +211,7 @@ export default function ParentEditComponent() {
         </div>
 
         {/* Middle Column - Parent Form */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 ">
           <div className="bg-[var(--bg-light)] rounded-xl shadow-neutral-700 p-6 border border-border-muted">
             <h2 className="text-xl font-semibold text-text mb-4">Parent Information</h2>
             <form onSubmit={handleSubmit}>

@@ -137,7 +137,7 @@ export default function SubjectsComponent() {
       <h1 className="text-2xl font-bold mb-4">Subjects Management</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
       {/* Left: Subject creation and listing */}
-      <div className="border p-4 rounded shadow-sm">
+      <div className="border bg-[var(--bg-light)] p-4 rounded shadow-sm">
         <h2 className="text-xl font-bold mb-4">Create Subject</h2>
 
         {error && <p className="text-red-500 mb-2">{error}</p>}
@@ -183,7 +183,7 @@ export default function SubjectsComponent() {
       </div>
 
       {/* Right: Assign subjects to teachers */}
-      <div className="border p-4 rounded shadow-sm">
+      <div className="border bg-[var(--bg-light)] p-4 rounded shadow-sm">
         <h2 className="text-xl font-bold mb-4">Assign Subjects to Teachers</h2>
 
         <div className="flex gap-2 mb-4">

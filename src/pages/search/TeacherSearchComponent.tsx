@@ -136,7 +136,7 @@ export default function TeacherSearchComponent() {
 
        <div className="flex items-center gap-4">
                   <button
-                    onClick={() => navigate("/registerParent")}
+                    onClick={() => navigate("/registerTeacher")}
                     className="flex items-center bg-[var(--bg-light)] border border-[var(--border-muted)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent placeholder:text-[var(--text-muted)] transition-all hover:bg-[var(--bg)] hover:text-[var(--primary)]"
                   >
                     <FaUserPlus className="mr-2" /> Register Teacher
