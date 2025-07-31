@@ -232,14 +232,14 @@ export default function TeacherSearchComponent() {
                 
                 <p className="font-medium text-[var(--text-muted)]">Subjects:</p>
                 <div className="flex flex-wrap gap-2">
-                  {(teacher.subjects || []).map((subject, idx) => (
-                    <span 
-                      key={idx} 
-                      className="bg-[var(--info)]/20 text-[var(--info)] border border-[var(--info)]/30 text-xs px-2 py-1 rounded-full"
-                    >
-                      {subject.subjectName}
-                    </span>
-                  ))}
+                 {teacher.subjects.map(subject => (
+  <span
+    key={subject.id}
+    className="bg-[var(--info)]/20 text-[var(--info)] border border-[var(--info)]/30 text-xs px-2 py-1 rounded-full"
+  >
+    {subject.subjectName}
+  </span>
+))} 
                 </div>
               </div>
             </div>

@@ -781,15 +781,7 @@ export default function SettingsComponent() {
           )}
         </div>
 
-        {/* Footer */}
-        <div className="mt-8 text-center text-[var(--text-light)]">
-          <p>© 2023 Athena Learning Center. All rights reserved.</p>
-          <div className="mt-2 flex justify-center space-x-6">
-            <Link to="#" className="hover:text-[var(--primary)] transition">Privacy Policy</Link>
-            <Link to="#" className="hover:text-[var(--primary)] transition">Terms of Service</Link>
-            <Link to="#" className="hover:text-[var(--primary)] transition">Help Center</Link>
-          </div>
-        </div>
+      
       </div>
     </div>
   );

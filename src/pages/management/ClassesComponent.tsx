@@ -1,11 +1,9 @@
-import { ChangeEvent, useEffect, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react";
 import { TeacherSearchForm } from "../search/TeacherSearchComponent";
 import { StudentForm } from "../../modal/forms/students/student";
 import axios from "axios";
-import { FaTrash } from "react-icons/fa6";
-import { FaCheck,  FaPlus } from "react-icons/fa";
+import { FaTrash, FaPlus, FaCheck, FaUserGraduate, FaChalkboardTeacher, FaSearch } from "react-icons/fa";
 import { Subject } from "./SubjectsComponent";
-
 interface Classroom {
   id: number;
   name: string;
@@ -38,6 +36,7 @@ export default function ClassesComponent() {
   const [searchId, setSearchId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false); 
+    const [activeTab, setActiveTab] = useState('create');
 
     // Teacher search filters
   const [teacherNameFilter, setTeacherNameFilter] = useState("")
@@ -249,286 +248,477 @@ export default function ClassesComponent() {
   if(error) return <p className="text-red-500">{error}</p>
 
    return (
-    <>
-      <div>Classroom Management</div>
-      <div className="shadow-md grid grid-cols-2 gap-4 flex-col items-start justify-center min-h-screen bg-gradient-to-br from-[var(--bg-dark)] via-[var(--bg)] to-[var(--bg-light)] p-4 relative">
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="text-center mb-10">
+        <h1 className="text-3xl md:text-4xl font-bold text-[var(--text)] mb-2">Classroom Management</h1>
+        <p className="text-[var(--text-light)] max-w-2xl mx-auto">
+          Create and manage classrooms, assign teachers and students
+        </p>
+      </div>
       
-        {/* Create A new Classroom */}
-        <div>
-          <h1 className="text-3xl font-bold mb-4 text-[var(--text)]">Create Classroom</h1>
-          {error && <p className="text-red-500 mb-2">{error}</p>}
-          {successClassroomId && (
-            <p className="text-green-500">Classroom created successfully! Classroom ID: {successClassroomId}</p>
+      {/* Navigation Tabs */}
+      <div className="flex border-b border-[var(--border)] mb-8">
+        <button
+          className={`px-6 py-3 font-medium ${activeTab === 'create' ? 'text-[var(--primary)] border-b-2 border-[var(--primary)]' : 'text-[var(--text-light)]'}`}
+          onClick={() => setActiveTab('create')}
+        >
+          Create Classroom
+        </button>
+        <button
+          className={`px-6 py-3 font-medium ${activeTab === 'all' ? 'text-[var(--primary)] border-b-2 border-[var(--primary)]' : 'text-[var(--text-light)]'}`}
+          onClick={() => setActiveTab('all')}
+        >
+          All Classrooms
+        </button>
+        <button
+          className={`px-6 py-3 font-medium ${activeTab === 'manage' ? 'text-[var(--primary)] border-b-2 border-[var(--primary)]' : 'text-[var(--text-light)]'}`}
+          onClick={() => setActiveTab('manage')}
+        >
+          Manage Classrooms
+        </button>
+      </div>
+
+      {/* Create Classroom Tab */}
+      {activeTab === 'create' && (
+        <div className="bg-[var(--bg-light)] rounded-2xl shadow-lg border border-[var(--border)] p-6 mb-8">
+          <div className="flex items-center mb-6">
+            <div className="bg-[var(--primary-light)] p-3 rounded-xl mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[var(--primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-[var(--text)]">Create New Classroom</h2>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
+              <p className="text-red-700 font-medium">{error}</p>
+            </div>
           )}
 
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label htmlFor="name" className="block text-[var(--text)] font-semibold mb-2">Name:</label>
+          <form onSubmit={handleSubmit} className="max-w-md">
+            <div className="mb-6">
+              <label className="block text-md font-medium text-[var(--text)] mb-2">Classroom Name</label>
               <input
                 type="text"
-                id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
+                className="w-full px-4 py-3 rounded-xl border-2 border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)] focus:outline-none transition text-lg bg-[var(--bg)] text-[var(--text)]"
+                placeholder="Enter classroom name"
               />
             </div>
-            <button type="submit" className="bg-[var(--primary)] text-white px-4 py-2 rounded hover:bg-[var(--primary-dark)]">
-              Create Classroom
+            <button
+              type="submit"
+              className={`px-6 py-3 bg-[var(--primary)] text-white rounded-xl hover:bg-[var(--primary-dark)] transition flex items-center ${
+                loading ? "opacity-75 cursor-not-allowed" : ""
+              }`}
+            >
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating...
+                </>
+              ) : (
+                "Create Classroom"
+              )}
             </button>
           </form>
-          {error && <p className="text-red-500 mt-4">{error}</p>}
         </div>
+      )}
 
-        {/* Showing the Available Classrooms */}
-        <div>
-          <h1 className="text-3xl font-bold mb-4 text-[var(--text)]">All Classrooms</h1>
-          <div className="grid grid-cols-5 gap-2">
-            {classrooms.map((classroom) => (
-              <div key={classroom.id} className="relative">
-                <ClassroomCard classroom={classroom} />
-                <button
-                  className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                  onClick={() => handleDeleteClassroom(classroom.id)}
-                  title="Delete Classroom"
+      {/* All Classrooms Tab */}
+      {activeTab === 'all' && (
+        <div className="bg-[var(--bg-light)] rounded-2xl shadow-lg border border-[var(--border)] p-6">
+          <div className="flex items-center mb-6">
+            <div className="bg-[var(--primary-light)] p-3 rounded-xl mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[var(--primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-[var(--text)]">All Classrooms</h2>
+          </div>
+
+          {classrooms.length === 0 ? (
+            <div className="text-center py-12 text-[var(--text-light)] border-2 border-dashed border-[var(--border)] rounded-xl">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-[var(--text-light)] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <p>No classrooms found. Create your first classroom.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {classrooms.map((classroom) => (
+                <div 
+                  key={classroom.id} 
+                  className={`bg-[var(--bg)] rounded-xl border border-[var(--border)] p-5 relative transition hover:shadow-lg ${
+                    selectedClassroomId === classroom.id ? "ring-2 ring-[var(--primary)]" : ""
+                  }`}
+                  onClick={() => handleSelectClassroom(classroom.id, classroom.name)}
                 >
-                  <FaTrash />
+                  <button
+                    className="absolute top-3 right-3 text-[var(--text-light)] hover:text-red-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClassroom(classroom.id);
+                    }}
+                    title="Delete Classroom"
+                  >
+                    <FaTrash />
+                  </button>
+                  
+                  <div className="flex items-center mb-4">
+                    <div className="bg-[var(--primary-light)] p-3 rounded-xl mr-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[var(--primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-bold text-[var(--text)]">{classroom.name}</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-[var(--bg-light)] p-3 rounded-lg">
+                      <div className="flex items-center">
+                        <FaChalkboardTeacher className="text-[var(--primary)] mr-2" />
+                        <span className="text-sm text-[var(--text-light)]">Teachers</span>
+                      </div>
+                      <p className="text-lg font-bold mt-1">{classroom.teachers.length}</p>
+                    </div>
+                    <div className="bg-[var(--bg-light)] p-3 rounded-lg">
+                      <div className="flex items-center">
+                        <FaUserGraduate className="text-[var(--primary)] mr-2" />
+                        <span className="text-sm text-[var(--text-light)]">Students</span>
+                      </div>
+                      <p className="text-lg font-bold mt-1">{classroom.students.length}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Manage Classrooms Tab */}
+      {activeTab === 'manage' && (
+        <div className="space-y-8">
+          {/* Selected Classroom Section */}
+          {selectedClassroomId ? (
+            <div className="bg-[var(--bg-light)] rounded-2xl shadow-lg border border-[var(--border)] p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-[var(--text)]">Managing: {selectedClassroomName}</h2>
+                  <p className="text-[var(--text-light)]">Classroom ID: {selectedClassroomId}</p>
+                </div>
+                <button
+                  className="text-[var(--text-light)] hover:text-[var(--primary)]"
+                  onClick={() => {
+                    setSelectedClassroomId(null);
+                    setSelectedClassroomName(null);
+                  }}
+                >
+                  Change Classroom
                 </button>
               </div>
-            ))}
-          </div>
-        </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Assigned Teachers */}
+                <div className="bg-[var(--bg)] rounded-xl border border-[var(--border)] p-5">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-bold text-[var(--text)] flex items-center">
+                      <FaChalkboardTeacher className="text-[var(--primary)] mr-2" />
+                      Assigned Teachers
+                    </h3>
+                    <span className="bg-[var(--primary-light)] text-[var(--primary)] px-3 py-1 rounded-full">
+                      {assignedTeachers.length} teachers
+                    </span>
+                  </div>
+                  
+                  {assignedTeachers.length === 0 ? (
+                    <div className="text-center py-6 text-[var(--text-light)]">
+                      No teachers assigned to this classroom
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {assignedTeachers.map((teacher) => (
+                        <div key={teacher.id} className="flex justify-between items-center p-3 bg-[var(--bg-light)] rounded-lg">
+                          <div>
+                            <h4 className="font-medium text-[var(--text)]">{teacher.displayName}</h4>
+                            <p className="text-sm text-[var(--text-light)]">
+                              {teacher.subjects.join(', ')}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteTeacher(teacher.id)}
+                            className="text-red-500 hover:text-red-700 flex items-center"
+                          >
+                            <FaTrash className="mr-1" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Assigned Students */}
+                <div className="bg-[var(--bg)] rounded-xl border border-[var(--border)] p-5">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-bold text-[var(--text)] flex items-center">
+                      <FaUserGraduate className="text-[var(--primary)] mr-2" />
+                      Assigned Students
+                    </h3>
+                    <span className="bg-[var(--primary-light)] text-[var(--primary)] px-3 py-1 rounded-full">
+                      {assignedStudents.length} students
+                    </span>
+                  </div>
+                  
+                  {assignedStudents.length === 0 ? (
+                    <div className="text-center py-6 text-[var(--text-light)]">
+                      No students assigned to this classroom
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {assignedStudents.map((student) => (
+                        <div key={student.id} className="flex justify-between items-center p-3 bg-[var(--bg-light)] rounded-lg">
+                          <div>
+                            <h4 className="font-medium text-[var(--text)]">ID: {student.id} - {student.name}</h4>
+                            <p className="text-sm text-[var(--text-light)]">{student.dob}</p>
+                             <p className="text-sm text-[var(--text-light)]">{student.address}</p>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteStudent(student.id)}
+                            className="text-red-500 hover:text-red-700 flex items-center"
+                          >
+                            <FaTrash className="mr-1" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-[var(--bg-light)] rounded-2xl shadow-lg border border-[var(--border)] p-6">
+              <div className="text-center py-12">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-[var(--text-light)] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <h3 className="text-xl font-bold text-[var(--text)] mb-2">Select a Classroom</h3>
+                <p className="text-[var(--text-light)] mb-4">Choose a classroom from the list to manage its teachers and students</p>
+                <button
+                  className="text-[var(--primary)] font-medium hover:underline"
+                  onClick={() => setActiveTab('all')}
+                >
+                  View All Classrooms
+                </button>
+              </div>
+            </div>
+          )}
 
-        <div className="shadow-md grid grid-cols-2 gap-4 flex-col items-start justify-center min-h-screen bg-gradient-to-br from-[var(--bg-dark)] via-[var(--bg)] to-[var(--bg-light)] p-4 relative">
-             {/* Display the Selected Classroom Section */}
-        {selectedClassroomId && (
-          <div className="mt-6 col-span-2">
-            <h2>Classroom Name: {selectedClassroomName}</h2>
+          {/* Teacher and Student Assignment Sections */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Teachers Section */}
+            <div className="bg-[var(--bg-light)] rounded-2xl shadow-lg border border-[var(--border)] p-6">
+              <div className="flex items-center mb-6">
+                <div className="bg-[var(--primary-light)] p-3 rounded-xl mr-4">
+                  <FaChalkboardTeacher className="h-6 w-6 text-[var(--primary)]" />
+                </div>
+                <h2 className="text-2xl font-bold text-[var(--text)]">Assign Teachers</h2>
+              </div>
+              
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-[var(--text)] mb-3">Search Teachers</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text-light)] mb-1">By Name</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Teacher name"
+                        className="w-full px-4 py-3 pl-10 rounded-xl border-2 border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)] focus:outline-none transition text-lg bg-[var(--bg)] text-[var(--text)]"
+                        value={teacherNameFilter}
+                        onChange={(e) => setTeacherNameFilter(e.target.value)}
+                      />
+                      <FaSearch className="absolute left-3 top-4 text-[var(--text-light)]" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text-light)] mb-1">By ID</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Teacher ID"
+                        className="w-full px-4 py-3 pl-10 rounded-xl border-2 border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)] focus:outline-none transition text-lg bg-[var(--bg)] text-[var(--text)]"
+                        value={teacherIdFilter}
+                        onChange={(e) => setTeacherIdFilter(e.target.value)}
+                      />
+                      <FaSearch className="absolute left-3 top-4 text-[var(--text-light)]" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text-light)] mb-1">By Gender</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Gender"
+                        className="w-full px-4 py-3 pl-10 rounded-xl border-2 border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)] focus:outline-none transition text-lg bg-[var(--bg)] text-[var(--text)]"
+                        value={teacherGenderFilter}
+                        onChange={(e) => setTeacherGenderFilter(e.target.value)}
+                      />
+                      <FaSearch className="absolute left-3 top-4 text-[var(--text-light)]" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text-light)] mb-1">By Subject</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Subject"
+                        className="w-full px-4 py-3 pl-10 rounded-xl border-2 border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)] focus:outline-none transition text-lg bg-[var(--bg)] text-[var(--text)]"
+                        value={teacherSubjectFilter}
+                        onChange={(e) => setTeacherSubjectFilter(e.target.value)}
+                      />
+                      <FaSearch className="absolute left-3 top-4 text-[var(--text-light)]" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-[var(--bg)] rounded-xl border border-[var(--border)] max-h-96 overflow-y-auto">
+                {filteredTeachers.length === 0 ? (
+                  <div className="text-center py-8 text-[var(--text-light)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-[var(--text-light)] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p>No teachers found matching your search</p>
+                  </div>
+                ) : (
+                  filteredTeachers.map((teacher) => (
+                    <div 
+                      key={teacher.id} 
+                      className="p-4 border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--bg-light)]"
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h4 className="font-medium text-[var(--text)]">{teacher.displayName}</h4>
+                          <p className="text-sm text-[var(--text-light)]">ID: {teacher.id} | {teacher.gender}</p>
+                          <p className="text-sm text-[var(--text-light)]">
+                            Subjects: {teacher.subjects.map(s => s.subjectName).join(', ')}
+                          </p>
+                        </div>
+                        <div>
+                          {isTeacherAssigned(teacher.id) ? (
+                            <span className="text-green-600 flex items-center">
+                              <FaCheck className="mr-1" /> Added
+                            </span>
+                          ) : (
+                            <button 
+                              onClick={() => handleAddTeacher(teacher.id)}
+                              className="text-[var(--primary)] hover:text-[var(--primary-dark)] flex items-center"
+                              disabled={!selectedClassroomId}
+                              title={!selectedClassroomId ? "Select a classroom first" : ""}
+                            >
+                              <FaPlus className="mr-1" /> Assign
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
             
-            {/* Assigned Teachers Section */}
-            <div className="mb-8">
-              <h3 className="text-xl font-bold mb-4">Assigned Teachers</h3>
-              <p>Total Teachers: {assignedTeachers.length}</p>
-              <table className="table-auto w-full border">
-                <thead>
-                  <tr className="bg-gray-200">
-                    <th className="border px-4 py-2">Name</th>
-                    <th className="border px-4 py-2">Gender</th>
-                    <th className="border px-4 py-2">Qualification</th>
-                    <th className="border px-4 py-2">DOB</th>
-                    <th className="border px-4 py-2">Subjects</th>
-                    <th className="border px-4 py-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {assignedTeachers.map((teacher) => (
-                    <tr key={teacher.id} className="hover:bg-gray-50">
-                      <td className="border px-4 py-2">{teacher.displayName}</td>
-                      <td className="border px-4 py-2">{teacher.gender}</td>
-                      <td className="border px-4 py-2">{teacher.qualification}</td>
-                      <td className="border px-4 py-2">{teacher.dob}</td>
-                      <td className="border px-4 py-2">{teacher.subjects.join(", ")}</td>
-                      <td className="border px-4 py-2">
-                        <button 
-                          onClick={() => handleDeleteTeacher(teacher.id)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Assigned Students Section */}
-            <div className="mb-8">
-              <h3 className="text-xl font-bold mb-4">Assigned Students</h3>
-              <p>Total Students : {assignedStudents.length}</p>
-              <table className="table-auto w-full border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border px-4 py-2">Name</th>
-                    <th className="border px-4 py-2">Address</th>
-                    <th className="border px-4 py-2">Date of Birth</th>
-                    <th className="border px-4 py-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {assignedStudents.map((student) => (
-                    <tr key={student.id} className="hover:bg-gray-50">
-                      <td className="border px-4 py-2">{student.name}</td>
-                      <td className="border px-4 py-2">{student.address}</td>
-                      <td className="border px-4 py-2">{student.dob}</td>
-                      <td className="border px-4 py-2">
-                        <button 
-                          onClick={() => handleDeleteStudent(student.id)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            {/* Students Section */}
+            <div className="bg-[var(--bg-light)] rounded-2xl shadow-lg border border-[var(--border)] p-6">
+              <div className="flex items-center mb-6">
+                <div className="bg-[var(--primary-light)] p-3 rounded-xl mr-4">
+                  <FaUserGraduate className="h-6 w-6 text-[var(--primary)]" />
+                </div>
+                <h2 className="text-2xl font-bold text-[var(--text)]">Assign Students</h2>
+              </div>
+              
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-[var(--text)] mb-3">Search Students</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text-light)] mb-1">By Name</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Student name"
+                        className="w-full px-4 py-3 pl-10 rounded-xl border-2 border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)] focus:outline-none transition text-lg bg-[var(--bg)] text-[var(--text)]"
+                        value={studentNameFilter}
+                        onChange={(e) => setStudentNameFilter(e.target.value)}
+                      />
+                      <FaSearch className="absolute left-3 top-4 text-[var(--text-light)]" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text-light)] mb-1">By Date of Birth</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="YYYY-MM-DD"
+                        className="w-full px-4 py-3 pl-10 rounded-xl border-2 border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)] focus:outline-none transition text-lg bg-[var(--bg)] text-[var(--text)]"
+                        value={studentDobFilter}
+                        onChange={(e) => setStudentDobFilter(e.target.value)}
+                      />
+                      <FaSearch className="absolute left-3 top-4 text-[var(--text-light)]" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-[var(--bg)] rounded-xl border border-[var(--border)] max-h-96 overflow-y-auto">
+                {filteredStudents.length === 0 ? (
+                  <div className="text-center py-8 text-[var(--text-light)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-[var(--text-light)] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p>No students found matching your search</p>
+                  </div>
+                ) : (
+                  filteredStudents.map((student) => (
+                    <div 
+                      key={student.id} 
+                      className="p-4 border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--bg-light)]"
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h4 className="font-medium text-[var(--text)]">{student.displayName}</h4>
+                          <p className="text-sm text-[var(--text-light)]">ID: {student.id} | DOB: {student.dob}</p>
+                          <p className="text-sm text-[var(--text-light)]">Address: {student.address}</p>
+                        </div>
+                        <div>
+                          {isStudentAssigned(student.id) ? (
+                            <span className="text-green-600 flex items-center">
+                              <FaCheck className="mr-1" /> Added
+                            </span>
+                          ) : (
+                            <button 
+                              onClick={() => handleAddStudent(student.id)}
+                              className="text-[var(--primary)] hover:text-[var(--primary-dark)] flex items-center"
+                              disabled={!selectedClassroomId}
+                              title={!selectedClassroomId ? "Select a classroom first" : ""}
+                            >
+                              <FaPlus className="mr-1" /> Assign
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
-        )}
         </div>
-
-        <div>
-                      {/* All Teachers Section with Search */}
-            <div className="mb-8">
-              <h3 className="text-xl font-bold mb-4">All Teachers</h3>
-              <div className="grid grid-cols-4 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Search by Name</label>
-                  <input
-                    type="text"
-                    placeholder="Teacher name"
-                    className="w-full p-2 border rounded"
-                    value={teacherNameFilter}
-                    onChange={(e) => setTeacherNameFilter(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Search by ID</label>
-                  <input
-                    type="text"
-                    placeholder="Teacher ID"
-                    className="w-full p-2 border rounded"
-                    value={teacherIdFilter}
-                    onChange={(e) => setTeacherIdFilter(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Search by Gender</label>
-                  <input
-                    type="text"
-                    placeholder="Gender"
-                    className="w-full p-2 border rounded"
-                    value={teacherGenderFilter}
-                    onChange={(e) => setTeacherGenderFilter(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Search by Subject</label>
-                  <input
-                    type="text"
-                    placeholder="Subject"
-                    className="w-full p-2 border rounded"
-                    value={teacherSubjectFilter}
-                    onChange={(e) => setTeacherSubjectFilter(e.target.value)}
-                  />
-                </div>
-              </div>
-              <table className="table-auto w-full border">
-                <thead>
-                  <tr className="bg-gray-200">
-                    <th className="border px-4 py-2">ID</th>
-                    <th className="border px-4 py-2">Qualification</th>
-                    <th className="border px-4 py-2">DOB</th>
-                    <th className="border px-4 py-2">Subjects</th>
-                    <th className="border px-4 py-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredTeachers.map((teacher) => (
-                    <tr key={teacher.id} className="hover:bg-gray-50">
-                      <td className="border px-4 py-2">{teacher.id}</td>
-                      <td className="border px-4 py-2">{teacher.displayName}</td>
-                      <td className="border px-4 py-2">{teacher.gender}</td>
-                      <td className="border px-4 py-2">{teacher.qualification}</td>
-                      <td className="border px-4 py-2">{teacher.dob}</td>
-                      <td className="border px-4 py-2">{teacher.subjects.map((subject) => subject.subjectName).join(", ")}</td>
-                      <td className="border px-4 py-2">
-                        {isTeacherAssigned(teacher.id) ? (
-                          <span className="text-green-500 flex items-center">
-                            <FaCheck className="mr-1" /> Added
-                          </span>
-                        ) : (
-                          <button 
-                            onClick={() => handleAddTeacher(teacher.id)}
-                            className="text-blue-500 hover:text-blue-700 flex items-center"
-                          >
-                            <FaPlus className="mr-1" /> Add
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* All Students Section with Search */}
-            <div>
-              <h3 className="text-xl font-bold mb-4">All Students</h3>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Search by Name</label>
-                  <input
-                    type="text"
-                    placeholder="Student name"
-                    className="w-full p-2 border rounded"
-                    value={studentNameFilter}
-                    onChange={(e) => setStudentNameFilter(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Search by DOB</label>
-                  <input
-                    type="text"
-                    placeholder="Date of Birth"
-                    className="w-full p-2 border rounded"
-                    value={studentDobFilter}
-                    onChange={(e) => setStudentDobFilter(e.target.value)}
-                  />
-                </div>
-              </div>
-              <table className="table-auto w-full border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border px-4 py-2">ID</th>
-                    <th className="border px-4 py-2">Name</th>
-                    <th className="border px-4 py-2">Address</th>
-                    <th className="border px-4 py-2">Date of Birth</th>
-                    <th className="border px-4 py-2">Classroom</th>
-                    <th className="border px-4 py-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredStudents.map((student) => (
-                    <tr key={student.id} className="hover:bg-gray-50">
-                      <td className="border px-4 py-2">{student.id}</td>
-                      <td className="border px-4 py-2">{student.displayName}</td>
-                      <td className="border px-4 py-2">{student.address}</td>
-                      <td className="border px-4 py-2">{student.dob}</td>
-                      <td className="border px-4 py-2">{student.classroomName}</td>
-                      <td className="border px-4 py-2">
-                        {isStudentAssigned(student.id) ? (
-                          <span className="text-green-500 flex items-center">
-                            <FaCheck className="mr-1" /> Added
-                          </span>
-                        ) : (
-                          <button 
-                            onClick={() => handleAddStudent(student.id)}
-                            className="text-blue-500 hover:text-blue-700 flex items-center"
-                          >
-                            <FaPlus className="mr-1" /> Add
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-        </div>
-       
-      </div>
-    </>
-  )
+      )}
+    </div>
+  );
 }
