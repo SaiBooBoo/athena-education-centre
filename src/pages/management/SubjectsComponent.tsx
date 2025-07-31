@@ -3,7 +3,7 @@ import axios from "axios";
 import { TeacherSearchForm } from "../search/TeacherSearchComponent";
 
 
-interface Subject {
+export interface Subject {
   id: number;
   subjectName: string;
 }
@@ -20,7 +20,7 @@ export default function SubjectsComponent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successSubjectId, setSuccessSubjectId] = useState<number | null>(null);
-
+  
   const BACKEND_URL = "http://localhost:8080/api/subjects";
 
   useEffect(() => {

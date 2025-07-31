@@ -54,7 +54,8 @@ export default function Sidebar({ isExpanded, onMouseEnter, onMouseLeave }) {
         { name: "Subjects", icon: <FiBook size={18} />, path: "/subjects" },
         { name: "Attendance", icon: <FiClock size={18} />, path: "/attendance" },
         { name: "Timetable", icon: <FiCalendar size={18} />, path: "/timetable" },
-        { name: "Student Promotion", icon: <FiBarChart2 size={18} />, path: "/studentPromotion" }
+        { name: "Student Promotion", icon: <FiBarChart2 size={18} />, path: "/studentPromotion" },
+        { name: "School Fees", icon: <FiGrid size={18} />, path: "/schoolFees" }
       ]
     },
     {

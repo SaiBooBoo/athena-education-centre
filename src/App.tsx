@@ -35,6 +35,7 @@ import { isLoggedIn } from "./service/AuthService";
 import ParentEditComponent from "./pages/edits/ParentEditComponent";
 import StudentEditComponent from "./pages/edits/StudentEditComponent";
 import TeacherEditComponent from "./pages/edits/TeacherEditComponent";
+import StudentFeesComponent from "./pages/management/StudentFeesComponent";
 
 // Guard Component
 const AuthenticationGuard = ({ children }) => {
@@ -84,6 +85,7 @@ const routeConfig = [
   { path: "/attendance", component: <AttentancesComponent /> },
   { path: "/timeTable", component: <TimeTableComponent /> },
   { path: "/studentPromotion", component: <StudentPromotionComponent /> },
+  { path: "/schoolFees", component: <StudentFeesComponent /> },
   { path: "/registerStudent", component: <StudentRegistration /> },
   { path: "/registerTeacher", component: <TeacherRegistration /> },
   { path: "/registerParent", component: <ParentRegistration /> },

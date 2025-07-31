@@ -22,7 +22,7 @@ export interface TeacherSearchForm {
   phoneNumber: string;
   gender: Gender;
   profileImagePath: string | null;
-  subjects:string[];
+  subjects:Subject[];
 }
 
 type Subject = {
@@ -237,7 +237,7 @@ export default function TeacherSearchComponent() {
                       key={idx} 
                       className="bg-[var(--info)]/20 text-[var(--info)] border border-[var(--info)]/30 text-xs px-2 py-1 rounded-full"
                     >
-                      {subject}
+                      {subject.subjectName}
                     </span>
                   ))}
                 </div>

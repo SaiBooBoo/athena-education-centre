@@ -3,8 +3,8 @@ import { TeacherSearchForm } from "../search/TeacherSearchComponent";
 import { StudentForm } from "../../modal/forms/students/student";
 import axios from "axios";
 import { FaTrash } from "react-icons/fa6";
-import { Subject } from "../../modal/dtos/student.dto";
-import { FaCheck, FaEdit, FaPlus } from "react-icons/fa";
+import { FaCheck,  FaPlus } from "react-icons/fa";
+import { Subject } from "./SubjectsComponent";
 
 interface Classroom {
   id: number;
@@ -134,7 +134,7 @@ export default function ClassesComponent() {
     const genderMatch = teacherGenderFilter === "" || teacher.gender.toLowerCase() === teacherGenderFilter.toLowerCase();
     const subjectMatch = teacherSubjectFilter === "" || 
       teacher.subjects.some(subject => 
-        subject.toLowerCase().includes(teacherSubjectFilter.toLowerCase())
+        subject.subjectName.toLowerCase().includes(teacherSubjectFilter.toLowerCase())
       );
     
     return nameMatch && idMatch && genderMatch && subjectMatch;
@@ -442,7 +442,7 @@ export default function ClassesComponent() {
                       <td className="border px-4 py-2">{teacher.gender}</td>
                       <td className="border px-4 py-2">{teacher.qualification}</td>
                       <td className="border px-4 py-2">{teacher.dob}</td>
-                      <td className="border px-4 py-2">{teacher.subjects.join(", ")}</td>
+                      <td className="border px-4 py-2">{teacher.subjects.map((subject) => subject.subjectName).join(", ")}</td>
                       <td className="border px-4 py-2">
                         {isTeacherAssigned(teacher.id) ? (
                           <span className="text-green-500 flex items-center">
